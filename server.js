@@ -9,6 +9,9 @@ wss.on("connection", (ws, req) => {
   const userId = urlParams.get("user_id");
   const role = urlParams.get("role");
 
+  ws.userId = userId;
+  ws.role = role;
+
   console.log(`New client connected: user_id=${userId}, role=${role}`);
 
   ws.on("message", (message) => {
