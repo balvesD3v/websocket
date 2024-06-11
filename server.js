@@ -15,11 +15,9 @@ wss.on("connection", (ws, req) => {
   console.log(`New client connected: user_id=${userId}, role=${role}`);
 
   ws.on("message", (message) => {
-    console.log(`Received from user_id=${userId}: ${message}`);
-
+    console.log(`Message received from user_id=${userId}: ${message}`);
     const parsedMessage = JSON.parse(message);
 
-    // If a user starts a chat, notify the consultant
     if (parsedMessage.type === "start_chat") {
       console.log(
         `Start chat request received from user_id=${userId} for consultant_id=${parsedMessage.consultant_id}`
@@ -31,18 +29,21 @@ wss.on("connection", (ws, req) => {
           client.userId === parsedMessage.consultant_id &&
           client.role === "consultant"
         ) {
-          client.send(
-            JSON.stringify({
-              type: "new_chat",
-              chat_session_id: parsedMessage.chat_session_id,
-              user_id: userId,
-              user_name: parsedMessage.user_name,
-            })
+          const newChatMessage = {
+            type: "new_chat",
+            chat_session_id: parsedMessage.chat_session_id,
+            user_id: userId,
+            user_name: parsedMessage.user_name,
+          };
+          console.log(
+            `Sending new_chat to consultant_id=${
+              parsedMessage.consultant_id
+            }: ${JSON.stringify(newChatMessage)}`
           );
+          client.send(JSON.stringify(newChatMessage));
         }
       });
-    } else {
-      // Broadcast the message to the specific chat participants
+    } else if (parsedMessage.type === "chat") {
       console.log(
         `Broadcasting message from user_id=${userId} to all clients in session ${parsedMessage.session_id}`
       );
@@ -52,6 +53,9 @@ wss.on("connection", (ws, req) => {
           client.readyState === WebSocket.OPEN &&
           (client.userId === parsedMessage.to || client.userId === userId)
         ) {
+          console.log(
+            `Sending chat message to client with user_id=${client.userId}: ${message}`
+          );
           client.send(message);
         }
       });
