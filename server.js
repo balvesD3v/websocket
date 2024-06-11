@@ -18,6 +18,10 @@ wss.on("connection", (ws, req) => {
 
     // If a user starts a chat, notify the consultant
     if (parsedMessage.type === "start_chat") {
+      console.log(
+        `Start chat request received from user_id=${userId} for consultant_id=${parsedMessage.consultant_id}`
+      );
+
       wss.clients.forEach((client) => {
         if (
           client.readyState === WebSocket.OPEN &&
@@ -36,6 +40,10 @@ wss.on("connection", (ws, req) => {
       });
     } else {
       // Broadcast the message to the specific chat participants
+      console.log(
+        `Broadcasting message from user_id=${userId} to all clients in session ${parsedMessage.session_id}`
+      );
+
       wss.clients.forEach((client) => {
         if (
           client.readyState === WebSocket.OPEN &&
