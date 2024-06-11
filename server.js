@@ -11,10 +11,6 @@ wss.on("connection", (ws, req) => {
 
   console.log(`New client connected: user_id=${userId}, role=${role}`);
 
-  // Store the client information
-  ws.userId = userId;
-  ws.role = role;
-
   ws.on("message", (message) => {
     console.log(`Received from user_id=${userId}: ${message}`);
 
@@ -33,7 +29,7 @@ wss.on("connection", (ws, req) => {
               type: "new_chat",
               chat_session_id: parsedMessage.chat_session_id,
               user_id: userId,
-              message: "New chat session started",
+              user_name: parsedMessage.user_name,
             })
           );
         }
