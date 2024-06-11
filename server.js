@@ -15,10 +15,11 @@ wss.on("connection", (ws, req) => {
   console.log(`New client connected: user_id=${userId}, role=${role}`);
 
   ws.on("message", (message) => {
-    console.log(`Received message from user_id=${userId}: ${message}`);
+    console.log(`Received from user_id=${userId}: ${message}`);
 
     const parsedMessage = JSON.parse(message);
 
+    // If a user starts a chat, notify the consultant
     if (parsedMessage.type === "start_chat") {
       console.log(
         `Start chat request received from user_id=${userId} for consultant_id=${parsedMessage.consultant_id}`
@@ -40,7 +41,8 @@ wss.on("connection", (ws, req) => {
           );
         }
       });
-    } else if (parsedMessage.type === "chat") {
+    } else {
+      // Broadcast the message to the specific chat participants
       console.log(
         `Broadcasting message from user_id=${userId} to all clients in session ${parsedMessage.session_id}`
       );
