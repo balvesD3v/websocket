@@ -11,14 +11,44 @@ wss.on("connection", (ws, req) => {
 
   console.log(`New client connected: user_id=${userId}, role=${role}`);
 
+  // Store the client information
+  ws.userId = userId;
+  ws.role = role;
+
   ws.on("message", (message) => {
     console.log(`Received from user_id=${userId}: ${message}`);
-    // Broadcast the message to all clients
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
-    });
+
+    const parsedMessage = JSON.parse(message);
+
+    // If a user starts a chat, notify the consultant
+    if (parsedMessage.type === "start_chat") {
+      wss.clients.forEach((client) => {
+        if (
+          client.readyState === WebSocket.OPEN &&
+          client.userId === parsedMessage.consultant_id &&
+          client.role === "consultant"
+        ) {
+          client.send(
+            JSON.stringify({
+              type: "new_chat",
+              chat_session_id: parsedMessage.chat_session_id,
+              user_id: userId,
+              message: "New chat session started",
+            })
+          );
+        }
+      });
+    } else {
+      // Broadcast the message to the specific chat participants
+      wss.clients.forEach((client) => {
+        if (
+          client.readyState === WebSocket.OPEN &&
+          (client.userId === parsedMessage.to || client.userId === userId)
+        ) {
+          client.send(message);
+        }
+      });
+    }
   });
 
   ws.on("close", () => {
