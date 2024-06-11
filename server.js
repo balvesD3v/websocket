@@ -53,15 +53,6 @@ wss.on("connection", (ws, req) => {
           client.send(message);
         }
       });
-
-      // Enviar confirmação de recebimento ao remetente
-      ws.send(
-        JSON.stringify({
-          type: "confirmation",
-          message_id: parsedMessage.message_id,
-          status: "received",
-        })
-      );
     }
   });
 
