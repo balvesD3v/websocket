@@ -12,7 +12,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 // Quando uma nova conexão é estabelecida
-wss.on("connection", (ws, req) => {
+wss.on("connection", (ws) => {
   console.log("Novo cliente conectado");
 
   // Quando uma mensagem é recebida do cliente
@@ -30,11 +30,6 @@ wss.on("connection", (ws, req) => {
   // Quando a conexão é fechada
   ws.on("close", () => {
     console.log("Cliente desconectado");
-  });
-
-  // Em caso de erro na conexão WebSocket
-  ws.on("error", (error) => {
-    console.error(`Erro na conexão WebSocket: ${error}`);
   });
 });
 
