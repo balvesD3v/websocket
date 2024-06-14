@@ -1,16 +1,13 @@
 {
-  "name": "ws",
+  "name": "websocket-server",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Servidor WebSocket para chat em tempo real",
+  "main": "websocket-server.js",
   "scripts": {
     "start": "node websocket-server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "express": "^4.19.2",
-    "ws": "^8.17.0"
+    "ws": "^7.4.5",
+    "http": "^0.0.1-security"
   }
 }
