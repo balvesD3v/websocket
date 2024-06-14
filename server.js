@@ -1,45 +1,24 @@
-const express = require("express");
-const http = require("http");
 const WebSocket = require("ws");
 
-// Inicializa a aplicação Express
-const app = express();
+const wss = new WebSocket.Server({ port: 8080 });
 
-// Cria um servidor HTTP e passa a aplicação Express para ele
-const server = http.createServer(app);
-
-// Inicializa o WebSocket Server
-const wss = new WebSocket.Server({ server });
-
-// Quando uma nova conexão é estabelecida
 wss.on("connection", (ws) => {
-  console.log("Novo cliente conectado");
+  console.log("New client connected");
 
-  // Quando uma mensagem é recebida do cliente
   ws.on("message", (message) => {
-    console.log(`Mensagem recebida: ${message}`);
-
-    // Envia a mensagem para todos os clientes conectados
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
-    });
+    try {
+      const parsedMessage = JSON.parse(message);
+      console.log("Received:", parsedMessage);
+      const jsonString = JSON.stringify(parsedMessage);
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(jsonString);
+        }
+      });
+    } catch (e) {
+      console.error("Error parsing message:", e);
+    }
   });
 
-  // Quando a conexão é fechada
-  ws.on("close", () => {
-    console.log("Cliente desconectado");
-  });
-});
-
-// Define uma rota simples para verificar se o servidor está funcionando
-app.get("/", (req, res) => {
-  res.send("Servidor WebSocket está funcionando!");
-});
-
-// Define a porta na qual o servidor vai escutar
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Servidor está escutando na porta ${PORT}`);
+  ws.send(JSON.stringify({ user: "System", text: "Welcome to the chat!" }));
 });
